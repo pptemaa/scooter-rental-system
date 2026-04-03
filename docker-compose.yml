@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: scooter_db
+    environment:
+      POSTGRES_USER: scooter_user
+      POSTGRES_PASSWORD: scooter_password
+      POSTGRES_DB: scooter_rental
+    ports:
+      - "5434:5432"
+    restart: unless-stopped
