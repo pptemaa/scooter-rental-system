@@ -17,14 +17,15 @@ public class Scooter {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_point_id")
     private RentalPoint rentalPoint;
+    @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)
-    private String status;
+    private Status status;
     @Column(name = "mileage", precision = 8, scale = 2)
     private BigDecimal mileage = new BigDecimal("0.00");
 
     public Scooter() {}
 
-    public Scooter(ScooterModel model, RentalPoint rentalPoint, String status, BigDecimal mileage) {
+    public Scooter(ScooterModel model, RentalPoint rentalPoint, Status status, BigDecimal mileage) {
         this.scooterModel = model;
         this.rentalPoint = rentalPoint;
         this.status = status;
@@ -47,11 +48,11 @@ public class Scooter {
         this.rentalPoint = rentalPoint;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

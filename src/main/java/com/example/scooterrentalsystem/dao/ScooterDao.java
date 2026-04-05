@@ -1,6 +1,7 @@
 package com.example.scooterrentalsystem.dao;
 
 import com.example.scooterrentalsystem.entity.Scooter;
+import com.example.scooterrentalsystem.entity.Status;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -19,8 +20,8 @@ public class ScooterDao {
     }
     public List<Scooter> findAvailableByRentalPoint(Long pointId) {
         return entityManager.createQuery(
-                        "SELECT s FROM Scooter s WHERE s.rentalPoint.id = :pointId AND s.status = 'AVAILABLE'", Scooter.class)
-                .setParameter("pointId", pointId)
+                        "SELECT s FROM Scooter s WHERE s.rentalPoint.id = :pointId AND s.status =:status", Scooter.class)
+                .setParameter("pointId", pointId).setParameter("status", Status.AVAILABLE)
                 .getResultList();
     }
 }

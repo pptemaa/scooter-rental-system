@@ -21,7 +21,7 @@ public class RentalPoint {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private RentalPoint parent;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "parent")
     private List<RentalPoint> subPoints = new ArrayList<>();
 
     public RentalPoint() {

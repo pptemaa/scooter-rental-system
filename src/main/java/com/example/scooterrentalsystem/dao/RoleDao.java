@@ -12,6 +12,6 @@ public class RoleDao {
     @PersistenceContext
     EntityManager em;
     public Optional<Role> findByName(String name){
-        return em.createQuery("SELECT r FROM Role r where r.name=:name").setParameter("name",name).getResultStream().findFirst();
+        return em.createQuery("SELECT r FROM Role r where r.name=:name", Role.class).setParameter("name",name).getResultStream().findFirst();
     }
 }
