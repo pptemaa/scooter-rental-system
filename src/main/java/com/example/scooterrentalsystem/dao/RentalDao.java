@@ -25,4 +25,7 @@ public class RentalDao {
     public List<Rental> findHistoryByUserId(Long userId){
         return em.createQuery("SELECT r FROM Rental r WHERE r.user.id=:userId and r.endTime is not null order by r.startTime desc", Rental.class).setParameter("userId",userId).getResultList();
     }
+    public List<Rental> findHistoryByScooterId(Long scooterId){
+        return em.createQuery("SELECT r FROM  Rental r WHERE r.scooter.id=:scooterId AND r.endTime IS NOT NULL ORDER BY r.startTime DESC ",Rental.class).setParameter("scooterId",scooterId).getResultList();
+    }
 }
