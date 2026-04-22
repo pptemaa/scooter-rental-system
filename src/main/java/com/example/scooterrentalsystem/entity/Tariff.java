@@ -10,9 +10,9 @@ public class Tariff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name",nullable = false,unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "type",nullable = false,unique = true)
+    @Column(name = "type", nullable = false)
     private String type;
     @Column(name = "price",precision = 10,scale = 2,nullable = false)
     private BigDecimal price;
@@ -30,6 +30,10 @@ public class Tariff {
 
     public String getName() {
         return name;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void setName(String name) {
