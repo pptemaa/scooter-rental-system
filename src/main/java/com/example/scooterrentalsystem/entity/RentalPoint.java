@@ -14,9 +14,9 @@ public class RentalPoint {
     private Long id;
     @Column(name = "name",nullable = false)
     private String name;
-    @Column(name = "latitude",precision = 10,scale = 8,nullable = false)
+    @Column(name = "latitude", precision = 10, scale = 8, nullable = false)
     private BigDecimal latitude;
-    @Column(name = "longitude",precision = 11,scale = 8,nullable = false)
+    @Column(name = "longitude", precision = 11, scale = 8, nullable = false)
     private BigDecimal longitude;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -32,6 +32,10 @@ public class RentalPoint {
         this.latitude = latitude;
         this.longitude = longitude;
         this.parent = parent;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
