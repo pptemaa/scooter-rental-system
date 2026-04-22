@@ -10,3 +10,9 @@ services:
     ports:
       - "5434:5432"
     restart: unless-stopped
+  redis:
+    image: redis:7.2-alpine
+    container_name: scooter-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
