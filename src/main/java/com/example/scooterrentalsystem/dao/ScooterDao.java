@@ -59,6 +59,17 @@ public class ScooterDao {
                 .getResultList();
     }
 
+    public List<Scooter> findByRentalPointId(Long pointId) {
+        return entityManager.createQuery(
+                        "SELECT s FROM Scooter s " +
+                                "JOIN FETCH s.scooterModel " +
+                                "LEFT JOIN FETCH s.rentalPoint " +
+                                "WHERE s.rentalPoint.id = :pointId",
+                        Scooter.class)
+                .setParameter("pointId", pointId)
+                .getResultList();
+    }
+
     public long countByModelId(Long modelId) {
         Long count = entityManager.createQuery(
                         "SELECT COUNT(s) FROM Scooter s WHERE s.scooterModel.id = :mid",
