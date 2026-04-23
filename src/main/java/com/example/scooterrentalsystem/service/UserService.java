@@ -31,16 +31,25 @@ public class UserService {
         this.rentalDao = rentalDao;
     }
 
-    public User registerUser(String email, String password, String firstName, String lastName, String roleName) {
+    public User registerUser(String email, String password, String firstName, String lastName, String roleName, java.math.BigDecimal balance) {
         if (userDao.findByEmail(email).isPresent()) {
             throw new ConflictException("Пользователь с email " + email + " уже существует");
         }
         Role role = roleDao.findByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException("Роль " + roleName + " не найдена в системе"));
-        User newUser = new User(email, password, firstName, lastName, role);
+        User newUser = new User(email, password, firstName, lastName, role, balance);
         userDao.save(newUser);
-        log.info("Зарегистрирован пользователь id={} email={}", newUser.getId(), email);
+        log.info("Зарегистрирован пользователь id={} email={} balance={}", newUser.getId(), email, newUser.getBalance());
         return userDao.findByIdWithRole(newUser.getId()).orElse(newUser);
+    }
+
+    public void topUpBalance(Long userId, java.math.BigDecimal amount) {
+        if (amount.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Сумма пополнения должна быть положительной");
+        }
+        User user = getUserById(userId);
+        user.setBalance(user.getBalance().add(amount));
+        log.info("Баланс пользователя id={} пополнен на {}", userId, amount);
     }
 
     public User updateUser(Long userId, UserUpdateDto dto) {

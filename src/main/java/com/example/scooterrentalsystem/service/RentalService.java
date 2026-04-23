@@ -42,6 +42,12 @@ public class RentalService {
     }
 
     public Rental startRental(Long userId, Long scooterId, Long tariffId) {
+        User user = userDao.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
+
+        if (user.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessLogicException("Недостаточно средств для начала аренды. Пополните баланс.");
+        }
+
         if (rentalDao.findActiveRentalByUserId(userId).isPresent()) {
             throw new BusinessLogicException("У пользователя уже есть активная аренда");
         }
@@ -49,7 +55,6 @@ public class RentalService {
             throw new BusinessLogicException("Этот самокат уже находится в аренде");
         }
 
-        User user = userDao.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
         Scooter scooter = scooterDao.findById(scooterId).orElseThrow(() -> new ResourceNotFoundException("Самокат не найден"));
         Tariff tariff = tariffDao.findById(tariffId).orElseThrow(() -> new ResourceNotFoundException("Тариф не найден"));
 
@@ -92,6 +97,13 @@ public class RentalService {
                 calculateCost(rental.getStartTime(), rental.getEndTime(), rental.getTariff());
         rental.setTotalCost(totalCost);
 
+        User user = rental.getUser();
+        user.setBalance(user.getBalance().subtract(totalCost));
+
+        if (user.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("У пользователя id={} возникла задолженность: {}", user.getId(), user.getBalance());
+        }
+
         Scooter scooter = rental.getScooter();
         scooter.setRentalPoint(endPoint);
         scooter.setStatus(Status.AVAILABLE);
@@ -108,19 +120,26 @@ public class RentalService {
     }
 
     private BigDecimal calculateCost(LocalDateTime start, LocalDateTime end, Tariff tariff) {
-        long minutes = Duration.between(start, end).toMinutes();
-        BigDecimal hours =
-                BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 4, RoundingMode.HALF_UP);
+        Duration duration = Duration.between(start, end);
+        long minutes = duration.toMinutes();
+        if (minutes < 1) minutes = 1;
 
-        String type = tariff.getType() != null ? tariff.getType().trim() : "";
+        BigDecimal price = tariff.getPrice();
         BigDecimal discount = tariff.getDiscount() != null ? tariff.getDiscount() : BigDecimal.ZERO;
 
-        if ("HOURLY".equalsIgnoreCase(type)) {
-            BigDecimal cost = tariff.getPrice().multiply(hours).subtract(discount);
-            return cost.compareTo(BigDecimal.ZERO) > 0 ? cost.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-        }
-        BigDecimal cost = tariff.getPrice().subtract(discount);
-        return cost.compareTo(BigDecimal.ZERO) > 0 ? cost.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal rawCost = switch (tariff.getType()) {
+            case MINUTE -> price.multiply(BigDecimal.valueOf(minutes));
+            case HOURLY -> {
+                BigDecimal hours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 4, RoundingMode.HALF_UP);
+                yield price.multiply(hours);
+            }
+            case FIXED -> price;
+        };
+
+        BigDecimal total = rawCost.subtract(discount);
+        return total.compareTo(BigDecimal.ZERO) > 0
+                ? total.setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
     }
 
     @Transactional(readOnly = true)
