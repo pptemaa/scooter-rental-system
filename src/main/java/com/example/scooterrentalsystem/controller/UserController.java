@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -32,8 +33,14 @@ public class UserController {
                         dto.password(),
                         dto.firstName(),
                         dto.lastName(),
-                        dto.roleName()
+                        dto.roleName(),
+                        dto.balance()
                 ));
+    }
+
+    @PatchMapping("/{id}/balance")
+    public void topUp(@PathVariable Long id, @RequestParam BigDecimal amount) {
+        userService.topUpBalance(id, amount);
     }
 
     @GetMapping
