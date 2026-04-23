@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -31,7 +32,7 @@ public class UserService {
         this.rentalDao = rentalDao;
     }
 
-    public User registerUser(String email, String password, String firstName, String lastName, String roleName, java.math.BigDecimal balance) {
+    public User registerUser(String email, String password, String firstName, String lastName, String roleName, BigDecimal balance) {
         if (userDao.findByEmail(email).isPresent()) {
             throw new ConflictException("Пользователь с email " + email + " уже существует");
         }
@@ -43,8 +44,8 @@ public class UserService {
         return userDao.findByIdWithRole(newUser.getId()).orElse(newUser);
     }
 
-    public void topUpBalance(Long userId, java.math.BigDecimal amount) {
-        if (amount.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+    public void topUpBalance(Long userId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Сумма пополнения должна быть положительной");
         }
         User user = getUserById(userId);

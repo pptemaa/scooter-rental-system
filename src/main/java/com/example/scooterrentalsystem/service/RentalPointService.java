@@ -99,6 +99,11 @@ public class RentalPointService {
     }
 
     @Transactional(readOnly = true)
+    public List<Scooter> getScootersAtPoint(Long pointId) {
+        return scooterDao.findByRentalPointId(pointId);
+    }
+
+    @Transactional(readOnly = true)
     public List<Scooter> getAvailableScootersAtPoint(Long pointId) {
         rentalPointDao.findById(pointId)
                 .orElseThrow(() -> new ResourceNotFoundException("Точка проката не найдена"));
