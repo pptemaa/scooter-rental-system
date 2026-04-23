@@ -2,6 +2,8 @@ package com.example.scooterrentalsystem.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -20,15 +22,22 @@ public class User {
     @JoinColumn(name = "role_id",nullable = false)
     private Role role;
 
+    @Column(name = "balance", precision = 12, scale = 2, nullable = false)
+    private BigDecimal balance = BigDecimal.ZERO;
+
+    @Version
+    private Integer version;
+
     public User() {
     }
 
-    public User(String email, String password, String firstName, String lastName, Role role) {
+    public User(String email, String password, String firstName, String lastName, Role role, BigDecimal balance) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+        this.balance = (balance != null) ? balance : BigDecimal.ZERO;
     }
 
     public Long getId() {
@@ -73,6 +82,18 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public Integer getVersion() {
+        return version;
     }
 
 }

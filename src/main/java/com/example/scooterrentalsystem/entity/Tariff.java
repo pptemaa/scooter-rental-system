@@ -2,18 +2,22 @@ package com.example.scooterrentalsystem.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "tariffs")
-public class Tariff {
+public class Tariff implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "name", nullable = false)
     private String name;
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private TariffType type;
     @Column(name = "price",precision = 10,scale = 2,nullable = false)
     private BigDecimal price;
     @Column(name = "discount", precision = 10, scale = 2)
@@ -21,7 +25,7 @@ public class Tariff {
 
     public Tariff() {}
 
-    public Tariff(String name, String type, BigDecimal price, BigDecimal discount) {
+    public Tariff(String name, TariffType type, BigDecimal price, BigDecimal discount) {
         this.name = name;
         this.type = type;
         this.price = price;
@@ -40,11 +44,11 @@ public class Tariff {
         this.name = name;
     }
 
-    public String getType() {
+    public TariffType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TariffType type) {
         this.type = type;
     }
 

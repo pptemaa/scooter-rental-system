@@ -23,6 +23,9 @@ public class Scooter {
     @Column(name = "mileage", precision = 8, scale = 2)
     private BigDecimal mileage = new BigDecimal("0.00");
 
+    @Version
+    private Integer version;
+
     public Scooter() {}
 
     public Scooter(ScooterModel model, RentalPoint rentalPoint, Status status, BigDecimal mileage) {
