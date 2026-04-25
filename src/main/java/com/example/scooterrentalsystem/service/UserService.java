@@ -10,6 +10,7 @@ import com.example.scooterrentalsystem.exeption.ConflictException;
 import com.example.scooterrentalsystem.exeption.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,11 +26,18 @@ public class UserService {
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final RentalDao rentalDao;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserDao userDao, RoleDao roleDao, RentalDao rentalDao) {
+    public UserService(UserDao userDao, RoleDao roleDao, RentalDao rentalDao, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.roleDao = roleDao;
         this.rentalDao = rentalDao;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public User findByEmail(String email) {
+        return userDao.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + email + " не найден"));
     }
 
     public User registerUser(String email, String password, String firstName, String lastName, String roleName, BigDecimal balance) {
@@ -38,7 +46,7 @@ public class UserService {
         }
         Role role = roleDao.findByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException("Роль " + roleName + " не найдена в системе"));
-        User newUser = new User(email, password, firstName, lastName, role, balance);
+        User newUser = new User(email, passwordEncoder.encode(password), firstName, lastName, role, balance);
         userDao.save(newUser);
         log.info("Зарегистрирован пользователь id={} email={} balance={}", newUser.getId(), email, newUser.getBalance());
         return userDao.findByIdWithRole(newUser.getId()).orElse(newUser);

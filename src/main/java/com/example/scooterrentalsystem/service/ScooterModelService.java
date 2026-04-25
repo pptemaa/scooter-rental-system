@@ -53,7 +53,7 @@ public class ScooterModelService {
             model.setName(name);
         }
         if (maxWeight != null) {
-            model.setMax_weight(maxWeight);
+            model.setMaxWeight(maxWeight);
         }
         ScooterModel merged = scooterModelDao.merge(model);
         log.info("Обновлена модель самоката id={}", id);
