@@ -2,23 +2,25 @@ package com.example.scooterrentalsystem.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "scooter_models")
-public class ScooterModel {
+public class ScooterModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "name",nullable = false)
     private String name;
     @Column(name = "max_weight")
-    private Integer max_weight;
+    private Integer maxWeight;
 
     public ScooterModel() {
     }
 
-    public ScooterModel(String name, Integer max_weight) {
+    public ScooterModel(String name, Integer maxWeight) {
         this.name = name;
-        this.max_weight = max_weight;
+        this.maxWeight = maxWeight;
     }
 
     public Long getId() {
@@ -33,11 +35,11 @@ public class ScooterModel {
         this.name = name;
     }
 
-    public Integer getMax_weight() {
-        return max_weight;
+    public Integer getMaxWeight() {
+        return maxWeight;
     }
 
-    public void setMax_weight(Integer max_weight) {
-        this.max_weight = max_weight;
+    public void setMaxWeight(Integer max_weight) {
+        this.maxWeight = max_weight;
     }
 }
