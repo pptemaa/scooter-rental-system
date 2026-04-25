@@ -4,6 +4,7 @@ import com.example.scooterrentalsystem.dto.RentalPointCreateDto;
 import com.example.scooterrentalsystem.dto.RentalPointResponseDto;
 import com.example.scooterrentalsystem.dto.RentalPointUpdateDto;
 import com.example.scooterrentalsystem.dto.ScooterResponseDto;
+import com.example.scooterrentalsystem.entity.RentalPoint;
 import com.example.scooterrentalsystem.mapper.RentalPointMapper;
 import com.example.scooterrentalsystem.mapper.ScooterMapper;
 import com.example.scooterrentalsystem.service.RentalPointService;
@@ -85,7 +86,7 @@ public class RentalPointController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RentalPointResponseDto create(@Valid @RequestBody RentalPointCreateDto dto) {
-        com.example.scooterrentalsystem.entity.RentalPoint p = 
+        RentalPoint p =
                 rentalPointService.addRentalPoint(dto.name(), dto.latitude(), dto.longitude(), dto.parentId());
         return new RentalPointResponseDto(p.getId(), p.getName(), p.getLatitude(), p.getLongitude(), p.getParent() != null ? p.getParent().getId() : null, 0, Map.of(), Map.of());
     }

@@ -24,20 +24,6 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDto register(@Valid @RequestBody UserCreateDto dto) {
-        return userMapper.toDto(
-                userService.registerUser(
-                        dto.email(),
-                        dto.password(),
-                        dto.firstName(),
-                        dto.lastName(),
-                        dto.roleName(),
-                        dto.balance()
-                ));
-    }
-
     @PatchMapping("/{id}/balance")
     public void topUp(@PathVariable Long id, @RequestParam BigDecimal amount) {
         userService.topUpBalance(id, amount);
