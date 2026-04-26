@@ -1,40 +1,74 @@
-# Scooter Rental System
+# 🛴 Scooter Rental System
 
-Spring Boot-приложение управления прокатом электросамокатов (PostgreSQL + Flyway, DAO на `EntityManager`, REST API без реализации входа/JWT по текущей задаче).
+Система управления прокатом электросамокатов, построенная на стеке **Spring Boot 3**, **PostgreSQL** и **Redis**.
 
-## Запуск PostgreSQL
+## 🌟 Основные возможности (ТЗ)
 
+- 🔐 **Безопасность**: Полноценная аутентификация и авторизация с использованием **JWT**. Разграничение прав для ролей `USER` и `MANAGER`.
+- 👥 **Пользователи**: Регистрация, аутентификация и возможность редактирования личной информации.
+- 📍 **Точки проката**: Иерархическая структура точек с географической привязкой (координаты WGS-84). Просмотр детальной информации о точке: список доступных самокатов, их модели и состояние.
+- 🛵 **Управление парком**: Полный CRUD для самокатов и точек проката (доступно менеджерам).
+- 💰 **Гибкая тарификация**: Поддержка различных типов тарифов:
+    - Почасовая оплата
+    - Поминутная оплата
+    - Фиксированная стоимость (абонемент)
+    - Возможность настройки базовой цены и скидок.
+- 🕒 **Аренда**: Запуск и завершение аренды с автоматическим расчетом стоимости и списанием средств с баланса пользователя.
+- 📜 **История**: 
+    - Просмотр истории аренд для клиента.
+    - Просмотр детальной истории конкретного самоката для менеджера (кто арендовал, пробег, время и др.).
+
+## 🛠 Технологический стек
+
+- **Backend**: Java 17, Spring Boot 3.4.0
+- **Security**: Spring Security, JWT (jjwt)
+- **Database**: PostgreSQL, Flyway (миграции)
+- **Data Access**: JPA, Hibernate, DAO (EntityManager)
+- **Caching**: Redis
+- **Mapping**: MapStruct
+- **Documentation**: Swagger UI (OpenAPI 3)
+- **Testing**: JUnit 5, Mockito, H2 (in-memory DB для тестов)
+
+## 🚀 Быстрый старт
+
+### Полный запуск через Docker (самый простой способ)
+Вам не нужно устанавливать Java или Maven. Просто запустите:
 ```bash
-docker compose up -d
+docker-compose up --build -d
 ```
+Эта команда соберет приложение и запустит его вместе с PostgreSQL и Redis. Приложение будет доступно на порту `8080`.
 
-Порт хоста по умолчанию: **5434** (`application.properties`: `jdbc:postgresql://localhost:5434/scooter_rental`).
+### Запуск инфраструктуры отдельно (для разработки)
+Если вы хотите запускать приложение из IDE:
+1. Запустите только БД и Redis:
+   ```bash
+   docker-compose up -d db redis
+   ```
+2. Запустите приложение через Maven или вашу IDE.
 
-## Запуск приложения
+### 3. Документация API (Swagger)
+После запуска подробная документация всех эндпоинтов доступна по адресу:
+👉 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
+*Интерфейс Swagger поддерживает авторизацию Bearer JWT.*
+
+## 🧪 Тестирование
+
+В проекте реализовано модульное и интеграционное тестирование слоев сервисов и контроллеров.
+
+Запуск всех тестов:
 ```bash
-mvn spring-boot:run
+mvn test
 ```
+*Тесты используют базу данных H2 в памяти и не требуют запущенного PostgreSQL/Redis.*
 
-## Основные REST-маршруты
+## 📂 Структура API
 
-| Префикс | Описание |
-|---------|----------|
-| `GET/POST/PUT/DELETE /api/roles` | Роли |
-| `POST /api/users` | Регистрация пользователя (`roleName`: например `USER`, `MANAGER`) |
-| `GET/GET id/PUT/DELETE /api/users` | Пользователи и профиль |
-| `GET/POST/PUT/DELETE /api/scooter-models` | Модели самокатов |
-| `GET/POST/PUT/PATCH …/status/DELETE /api/scooters` | Самокаты |
-| `GET/POST/PUT/DELETE /api/rental-points` | Иерархия точек проката (`GET /roots`, `GET /{parentId}/children`). **Широта/долгота обязательны** (WGS-84: широта −90…90, долгота −180…180) |
-| `GET/POST/PUT/DELETE /api/tariffs` | Тарифы (`type`: например `HOURLY`, `SUBSCRIPTION`) |
-| `POST /api/rentals/start`, `POST /api/rentals/finish` | Начало / завершение аренды |
-| `GET /api/rentals/history/user/{userId}` | История аренд клиента |
-| `GET /api/rentals/history/scooter/{scooterId}` | История по самокату (для администрирования) |
-
-Spring Security включён с `permitAll()` для всех запросов (без авторизации по ролям).
-
-## Миграции БД
-
-- `V1__init_schema.sql` — схема
-- `V2__seed_roles.sql` — начальные роли `USER`, `MANAGER`
-- `V3__rental_points_coordinates_not_null.sql` — координаты точек проката NOT NULL в БД (строки с NULL получают `0` перед ограничением — при необходимости поправьте данные вручную)
+| Ресурс | Описание | Доступ |
+|--------|----------|--------|
+| `/api/auth/**` | Регистрация и вход (JWT) | Public |
+| `/api/users/**` | Профиль пользователя, баланс | MANAGER / Собственник |
+| `/api/rentals/**` | Аренда, история аренд | AUTHENTICATED |
+| `/api/scooters/**` | Управление самокатами | GET: Public, CRUD: MANAGER |
+| `/api/rental-points/**` | Точки проката | GET: Public, CRUD: MANAGER |
+| `/api/tariffs/**` | Управление тарифами | GET: Public, CRUD: MANAGER |
