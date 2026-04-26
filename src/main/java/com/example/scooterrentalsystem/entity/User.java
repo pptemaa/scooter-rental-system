@@ -96,4 +96,7 @@ public class User {
         return version;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

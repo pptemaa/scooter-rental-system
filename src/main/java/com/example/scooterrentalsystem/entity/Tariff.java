@@ -67,4 +67,8 @@ public class Tariff implements Serializable {
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
